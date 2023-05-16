@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"os"
 )
 
 type Database struct {
@@ -10,12 +11,12 @@ type Database struct {
 }
 
 func NewConnection() *Database {
-	const (
-		host     = "localhost"
-		port     = 5432
-		user     = "postgres"
-		password = "your-password"
-		dbname   = "strvdb"
+	var (
+		host     = os.Getenv("POSTGRE_HOST")
+		port     = os.Getenv("POSTGRE_PORT")
+		user     = os.Getenv("POSTGRE_USER")
+		password = os.Getenv("POSTGRE_PASS")
+		dbname   = os.Getenv("POSTGRE_DB")
 	)
 
 	connStr := fmt.Sprintf("host=%s port=%d user=%s "+
