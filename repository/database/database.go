@@ -38,7 +38,7 @@ func NewConnection(ctx context.Context) *Database {
 
 	db, err := pgxpool.New(ctx, connStr)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Unable to connect to repository: %v\n", err)
 		os.Exit(1)
 	}
 	defer db.Close()

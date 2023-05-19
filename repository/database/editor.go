@@ -3,7 +3,7 @@ package database
 import (
 	"context"
 	"github.com/jackc/pgx/v5"
-	"github.com/marhycz/strv-go-newsletter/database/query"
+	"github.com/marhycz/strv-go-newsletter/repository/database/query"
 )
 
 func CreateEditor(ctx context.Context, querier Querier, password string, email string) (*Editor, error) {
