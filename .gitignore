@@ -22,3 +22,7 @@ go.work
 
 # Environment files
 .env
+firebase_key.json
+
+# IDE files
+.vscode

@@ -1,9 +1,11 @@
-package strv_go_newsletter
+package main
 
 import (
 	"context"
 	"github.com/marhycz/strv-go-newsletter/database"
-	"github.com/marhycz/strv-go-newsletter/environment"
+	"github.com/marhycz/strv-go-newsletter/environment" */
+
+	initFirebase "github.com/marhycz/strv-go-newsletter/database/firebase"
 )
 
 func main() {
@@ -12,5 +14,7 @@ func main() {
 	env := &environment.Env{
 		Database: database.NewConnection(ctx),
 	}
+	fmt.Println(env) */
 	// api.Serve(env)
+	initFirebase.InitSDK()
 }
