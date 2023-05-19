@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/marhycz/strv-go-newsletter/api"
 	"github.com/marhycz/strv-go-newsletter/environment"
 	"github.com/marhycz/strv-go-newsletter/repository/database"
 
@@ -16,6 +17,6 @@ func main() {
 		Database: database.NewConnection(ctx),
 	}
 	fmt.Println(env)
-	// api.Serve(env)
+	api.Serve(env)
 	initFirebase.InitSDK()
 }
