@@ -1,40 +1,54 @@
 package database
 
 import (
-	"database/sql"
+	"context"
+	"embed"
 	"fmt"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"os"
 )
 
+//go:embed migrations/*.sql
+var migrationFs embed.FS
+
 type Database struct {
-	database *sql.DB
+	database *pgxpool.Pool
 }
 
-func NewConnection() *Database {
+// https://github.com/jackc/pgx/issues/1188
+type Querier interface {
+	Exec(ctx context.Context, sql string, arguments ...any) (pgconn.CommandTag, error)
+	Query(ctx context.Context, sql string, optionsAndArgs ...any) (pgx.Rows, error)
+	SendBatch(ctx context.Context, b *pgx.Batch) pgx.BatchResults
+}
+
+func NewConnection(ctx context.Context) *Database {
 	var (
-		host     = os.Getenv("POSTGRE_HOST")
-		port     = os.Getenv("POSTGRE_PORT")
-		user     = os.Getenv("POSTGRE_USER")
-		password = os.Getenv("POSTGRE_PASS")
-		dbname   = os.Getenv("POSTGRE_DB")
+		host     = os.Getenv("POSTGRES_HOST")
+		port     = os.Getenv("POSTGRES_PORT")
+		user     = os.Getenv("POSTGRES_USER")
+		password = os.Getenv("POSTGRES_PASSWORD")
+		dbname   = os.Getenv("POSTGRES_DB")
 	)
 
-	connStr := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
+	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
 		host, port, user, password, dbname)
 
-	db, err := sql.Open("postgres", connStr)
+	db, err := pgxpool.New(ctx, connStr)
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		os.Exit(1)
 	}
 	defer db.Close()
 
-	err = db.Ping()
+	err = db.Ping(ctx)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("Successfully connected!")
+	fmt.Println("Successfully connected to DB!")
 
 	d := &Database{
 		database: db,
