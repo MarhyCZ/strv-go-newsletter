@@ -34,7 +34,7 @@ func NewConnection(ctx context.Context) *Database {
 	)
 
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
-		host, port, user, password, dbname)
+		user, password, host, port, dbname)
 
 	db, err := pgxpool.New(ctx, connStr)
 	if err != nil {
