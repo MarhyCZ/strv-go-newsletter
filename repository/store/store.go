@@ -27,7 +27,7 @@ func NewConnection(ctx context.Context) *Store {
 		log.Fatalln(err)
 	}
 
-	defer client.Close()
+	// defer client.Close()
 
 	fb := &Store{
 		client: client,

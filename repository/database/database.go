@@ -41,7 +41,7 @@ func NewConnection(ctx context.Context) *Database {
 		fmt.Fprintf(os.Stderr, "Unable to connect to repository: %v\n", err)
 		os.Exit(1)
 	}
-	defer db.Close()
+	// defer db.Close()
 
 	err = db.Ping(ctx)
 	if err != nil {
