@@ -36,9 +36,11 @@ func NewConnection(ctx context.Context) *Store {
 }
 
 // Its like a class method.
-func (fb *Store) GetSubscriptions(ctx context.Context) {
+func (fb *Store) GetSubscriptions(ctx context.Context) []Subscription {
 	//get all subscriptions
 	iter := fb.client.Collection("subscription").Documents(ctx)
+	var subscriptions []Subscription
+
 	for {
 		doc, err := iter.Next()
 		if err == iterator.Done {
@@ -47,7 +49,12 @@ func (fb *Store) GetSubscriptions(ctx context.Context) {
 		if err != nil {
 			log.Fatalf("Failed to iterate: %v", err)
 		}
-		fmt.Println(doc.Data())
+		var subscription Subscription
+		doc.DataTo(&subscriptions)
+		if err != nil {
+			log.Fatalln("Failed to map subscription to struct: %v", err)
+		}
+		subscriptions = append(subscriptions, subscription)
 	}
 	//get subscription
 	sub := fb.client.Collection("subscription").Where("id", "==", "csBgld5GN7hn4lB0ISaX").Documents(ctx)
@@ -62,6 +69,7 @@ func (fb *Store) GetSubscriptions(ctx context.Context) {
 		fmt.Println(doc.Data())
 	}
 
+	return subscriptions
 	//new subscription TO FIX
 	/* _, _, err := fb.client.Collection("subscription").Add(ctx, map[string]interface{}{
 	     "email": "Jack@McMc.cz",

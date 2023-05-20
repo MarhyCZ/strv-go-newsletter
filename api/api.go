@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/marhycz/strv-go-newsletter/environment"
@@ -37,8 +38,11 @@ func (rest *Rest) initRouter() {
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		rest.env.Store.GetSubscriptions(ctx)
-		w.Write([]byte("hi"))
+		subscriptions := rest.env.Store.GetSubscriptions(ctx)
+		err := json.NewEncoder(w).Encode(subscriptions)
+		if err != nil {
+			w.WriteHeader(http.StatusNotFound)
+		}
 	})
 
 	rest.routeEditor(r)
