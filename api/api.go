@@ -3,14 +3,25 @@ package api
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/marhycz/strv-go-newsletter/api/routes"
 	"github.com/marhycz/strv-go-newsletter/environment"
 	"net/http"
-	"os"
 	"time"
 )
 
-func Serve(env *environment.Env) {
+type Rest struct {
+	*chi.Mux
+	env *environment.Env
+}
+
+func NewController(env *environment.Env) *Rest {
+	c := &Rest{
+		env: env,
+	}
+	c.initRouter()
+	return c
+}
+
+func (rest *Rest) initRouter() {
 	r := chi.NewRouter()
 
 	// A good base middleware stack
@@ -25,9 +36,11 @@ func Serve(env *environment.Env) {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		rest.env.Store.GetSubscriptions(ctx)
 		w.Write([]byte("hi"))
 	})
 
-	routes.RouteEditor(r)
-	http.ListenAndServe(":"+os.Getenv("API_PORT"), r)
+	rest.routeEditor(r)
+	rest.Mux = r
 }

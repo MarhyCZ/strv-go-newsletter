@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/marhycz/strv-go-newsletter/api"
 	"github.com/marhycz/strv-go-newsletter/environment"
 	"github.com/marhycz/strv-go-newsletter/repository/database"
-
 	"github.com/marhycz/strv-go-newsletter/repository/store"
+	"log"
+	"net/http"
+	"os"
 )
 
 func main() {
@@ -19,7 +20,9 @@ func main() {
 		Database: database.NewConnection(ctx),
 		Store:    store.NewConnection(ctx),
 	}
-	fmt.Println(env)
-	api.Serve(env)
-	env.Store.GetSubscriptions(ctx)
+
+	controller := api.NewController(env)
+	if err := http.ListenAndServe(":"+os.Getenv("API_PORT"), controller); err != nil {
+		log.Fatal(err.Error())
+	}
 }
