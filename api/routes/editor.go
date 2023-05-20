@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/go-chi/chi/v5"
+	"github.com/marhycz/strv-go-newsletter/repository/database"
 	"net/http"
 )
 
@@ -19,6 +20,7 @@ func RouteEditor(r *chi.Mux) {
 }
 
 func signup(w http.ResponseWriter, r *http.Request) {
+	database.CreateEditor()
 	w.Write([]byte("hi"))
 }
 

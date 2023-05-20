@@ -7,16 +7,19 @@ import (
 	"github.com/marhycz/strv-go-newsletter/environment"
 	"github.com/marhycz/strv-go-newsletter/repository/database"
 
-	initFirebase "github.com/marhycz/strv-go-newsletter/repository/firebase"
+	"github.com/marhycz/strv-go-newsletter/repository/store"
 )
 
 func main() {
+	// Context should  be passed directly to functions, not stored in structs
+	// https://pkg.go.dev/context#Background
 	ctx := context.Background()
 
 	env := &environment.Env{
 		Database: database.NewConnection(ctx),
+		Store:    store.NewConnection(ctx),
 	}
 	fmt.Println(env)
 	api.Serve(env)
-	initFirebase.InitSDK()
+	env.Store.GetSubscriptions(ctx)
 }

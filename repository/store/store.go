@@ -1,18 +1,21 @@
-package initFirebase
+package store
 
 import (
+	"cloud.google.com/go/firestore"
 	"context"
+	"firebase.google.com/go"
 	"fmt"
-	"log"
-
-	firebase "firebase.google.com/go"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
+	"log"
 )
 
+type Store struct {
+	client *firestore.Client
+}
+
 // Use a service account
-func InitSDK() {
-	ctx := context.Background()
+func NewConnection(ctx context.Context) *Store {
 	sa := option.WithCredentialsFile("config/firebase_key.json")
 	app, err := firebase.NewApp(ctx, nil, sa)
 	if err != nil {
@@ -26,8 +29,16 @@ func InitSDK() {
 
 	defer client.Close()
 
+	fb := &Store{
+		client: client,
+	}
+	return fb
+}
+
+// Its like a class method.
+func (fb *Store) GetSubscriptions(ctx context.Context) {
 	//get all subscriptions
-	iter := client.Collection("subscription").Documents(ctx)
+	iter := fb.client.Collection("subscription").Documents(ctx)
 	for {
 		doc, err := iter.Next()
 		if err == iterator.Done {
@@ -39,7 +50,7 @@ func InitSDK() {
 		fmt.Println(doc.Data())
 	}
 	//get subscription
-	sub := client.Collection("subscription").Where("id", "==", "csBgld5GN7hn4lB0ISaX").Documents(ctx)
+	sub := fb.client.Collection("subscription").Where("id", "==", "csBgld5GN7hn4lB0ISaX").Documents(ctx)
 	for {
 		doc, err := sub.Next()
 		if err == iterator.Done {
@@ -52,12 +63,12 @@ func InitSDK() {
 	}
 
 	//new subscription TO FIX
-	/* _, _, err := client.Collection("subscription").Add(ctx, map[string]interface{}{
-	  "email": "Jack@McMc.cz",
-	  "id": "239kjl21kj312ljk232",
-	  "newsletter_id": "13",
-	})
-	if err != nil {
-	  log.Fatalf("Failed adding alovelace: %v", err)
-	} */
+	/* _, _, err := fb.client.Collection("subscription").Add(ctx, map[string]interface{}{
+	     "email": "Jack@McMc.cz",
+	     "id": "239kjl21kj312ljk232",
+	     "newsletter_id": "13",
+	   })
+	   if err != nil {
+	     log.Fatalf("Failed adding alovelace: %v", err)
+	   } */
 }
