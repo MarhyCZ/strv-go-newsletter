@@ -4,4 +4,4 @@ SELECT
     email,
     created_at,
     updated_at
-FROM editor
+FROM editor;

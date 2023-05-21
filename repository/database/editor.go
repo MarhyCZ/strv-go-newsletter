@@ -20,7 +20,6 @@ func CreateEditor(ctx context.Context, querier Querier, password string, email s
 	if err != nil {
 		return nil, err
 	}
-
 	return editor, nil
 }
 
