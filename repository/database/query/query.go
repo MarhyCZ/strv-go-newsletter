@@ -8,4 +8,7 @@ var (
 
 	//go:embed scripts/CreateEditor.sql
 	CreateEditor string
+
+	//go:embed scripts/getEditor.sql
+	GetEditor string
 )

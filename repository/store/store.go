@@ -1,13 +1,14 @@
 package store
 
 import (
-	"cloud.google.com/go/firestore"
 	"context"
-	"firebase.google.com/go"
 	"fmt"
+	"log"
+
+	"cloud.google.com/go/firestore"
+	firebase "firebase.google.com/go"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
-	"log"
 )
 
 type Store struct {
@@ -32,6 +33,8 @@ func NewConnection(ctx context.Context) *Store {
 	fb := &Store{
 		client: client,
 	}
+
+	fmt.Println("Firestore started")
 	return fb
 }
 

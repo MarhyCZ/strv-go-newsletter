@@ -1,8 +1,9 @@
 package database
 
 import (
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 func NewNewsletter(editorID uuid.UUID, name string, description string) *Newsletter {
@@ -57,4 +58,9 @@ type Editor struct {
 	Email     string    `repository:"email"`
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
+}
+
+type NewEditorInput struct {
+	Email    string `json:"email"    validate:"required,email"`
+	Password string `json:"password" validate:"required"`
 }
