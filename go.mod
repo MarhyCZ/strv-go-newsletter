@@ -24,6 +24,7 @@ require (
 	github.com/georgysavva/scany/v2 v2.0.0
 	github.com/go-chi/chi/v5 v5.0.8 // indirect
 	github.com/go-playground/validator/v10 v10.13.0
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/gomarkdown/markdown v0.0.0-20230322041520-c84983bdbf2a // indirect

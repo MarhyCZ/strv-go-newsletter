@@ -28,5 +28,4 @@ func main() {
 	if err := http.ListenAndServe(":"+os.Getenv("API_PORT"), controller); err != nil {
 		log.Fatal(err.Error())
 	}
-	fmt.Println("DONE")
 }
