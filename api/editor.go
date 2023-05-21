@@ -21,26 +21,25 @@ var (
 func (rest *Rest) routeEditor(r *chi.Mux) {
 	// RESTy routes for "articles" resource
 	r.Route("/login", func(r chi.Router) {
-		r.Post("/", rest.login) // POST /editor
+		r.Post("/", rest.login)
 	})
 	r.Route("/signup", func(r chi.Router) {
-		r.Post("/", rest.signup) // POST /editor
+		r.Post("/", rest.signup)
 	})
 	r.Route("/resetpassword", func(r chi.Router) {
-		r.Post("/", rest.resetPassword) // POST /editor
+		r.Post("/", rest.resetPassword)
 	})
 	r.Route("/logout", func(r chi.Router) {
-		r.Get("/", rest.logout) // POST /editor
+		r.Get("/", rest.logout)
 	})
 	r.Route("/getEditors", func(r chi.Router) {
-		r.Get("/", rest.getEditors) // POST /editor
+		r.Get("/", rest.getEditors)
 	})
 }
 
 func (rest *Rest) signup(w http.ResponseWriter, r *http.Request) {
 
 	newEditorInput := database.NewEditorInput{}
-
 	if err := parseRequestBody(r, &newEditorInput); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -48,10 +47,11 @@ func (rest *Rest) signup(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	db := rest.env.Database.Database
-
 	if exists, _ := database.GetEditorByEmail(ctx, db, newEditorInput.Email); exists != nil {
+		err := ErrUserAlreadyExists
 		w.WriteHeader(http.StatusConflict)
-		panic(ErrUserAlreadyExists)
+		w.Write([]byte(err.Error()))
+		return
 	}
 
 	passwordHash, err := HashPassword(newEditorInput.Password)
@@ -77,7 +77,6 @@ func (rest *Rest) getEditors(w http.ResponseWriter, r *http.Request) {
 	}
 
 	db := rest.env.Database.Database
-
 	editors, err := database.ListEditors(r.Context(), db)
 	if err != nil {
 		panic(err)
@@ -104,9 +103,10 @@ func (rest *Rest) login(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	if !CheckPasswordHash(LoginInput.Password, e.Password) {
+		err := ErrUserWrongCredentials
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte(strconv.Itoa(http.StatusUnauthorized) + ": " + http.StatusText(http.StatusUnauthorized)))
-		w.Write([]byte("\n" + "Wrong login credentials"))
+		w.Write([]byte("\n" + err.Error()))
 		return
 	}
 
