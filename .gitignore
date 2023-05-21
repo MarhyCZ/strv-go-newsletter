@@ -26,3 +26,4 @@ firebase_key.json
 
 # IDE files
 .vscode
+.idea
