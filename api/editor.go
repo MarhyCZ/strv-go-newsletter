@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -67,6 +68,24 @@ func (rest *Rest) signup(w http.ResponseWriter, r *http.Request) {
 }
 
 func (rest *Rest) getEditors(w http.ResponseWriter, r *http.Request) {
+
+	c, err := r.Cookie("token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte(strconv.Itoa(http.StatusUnauthorized) + ": " + http.StatusText(http.StatusUnauthorized)))
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(strconv.Itoa(http.StatusBadRequest) + ": " + http.StatusText(http.StatusBadRequest)))
+		return
+	}
+
+	if code, err := Auth(c); err != nil {
+		w.WriteHeader(code)
+		w.Write([]byte(strconv.Itoa(code) + ": " + http.StatusText(code)))
+		return
+	}
 
 	db := rest.env.Database.Database
 
