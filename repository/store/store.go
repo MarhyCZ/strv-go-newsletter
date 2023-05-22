@@ -1,13 +1,13 @@
 package store
 
 import (
-	"cloud.google.com/go/firestore"
 	"context"
-	"firebase.google.com/go"
-	"fmt"
+	"log"
+
+	"cloud.google.com/go/firestore"
+	firebase "firebase.google.com/go"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
-	"log"
 )
 
 type Store struct {
@@ -37,39 +37,24 @@ func NewConnection(ctx context.Context) *Store {
 
 // Its like a class method.
 func (fb *Store) GetSubscriptions(ctx context.Context) []Subscription {
-	//get all subscriptions
-	iter := fb.client.Collection("subscription").Documents(ctx)
 	var subscriptions []Subscription
+iter := fb.client.Collection("subscription").Documents(ctx)
 
-	for {
-		doc, err := iter.Next()
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
+for {
+    doc, err := iter.Next()
+    if err == iterator.Done {
+        break
+    }
+    if err != nil {
 			log.Fatalf("Failed to iterate: %v", err)
-		}
-		var subscription Subscription
-		doc.DataTo(&subscriptions)
-		if err != nil {
+    }
+    var subscription Subscription
+    if err := doc.DataTo(&subscription); err != nil {
 			log.Fatalln("Failed to map subscription to struct: %v", err)
-		}
-		subscriptions = append(subscriptions, subscription)
-	}
-	//get subscription
-	sub := fb.client.Collection("subscription").Where("id", "==", "csBgld5GN7hn4lB0ISaX").Documents(ctx)
-	for {
-		doc, err := sub.Next()
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
-			log.Fatalf("Failed to iterate: %v", err)
-		}
-		fmt.Println(doc.Data())
-	}
-
-	return subscriptions
+    }
+    subscriptions = append(subscriptions, subscription)
+}
+return subscriptions
 	//new subscription TO FIX
 	/* _, _, err := fb.client.Collection("subscription").Add(ctx, map[string]interface{}{
 	     "email": "Jack@McMc.cz",
@@ -79,4 +64,26 @@ func (fb *Store) GetSubscriptions(ctx context.Context) []Subscription {
 	   if err != nil {
 	     log.Fatalf("Failed adding alovelace: %v", err)
 	   } */
+}
+
+func (fb *Store) GetSubscription(ctx context.Context, newsletter_id int, email string) []Subscription {
+		var subscriptions []Subscription
+
+		iter := fb.client.Collection("subscription").Where("newsletter_id", "==", newsletter_id).Where("email", "==", email).Documents(ctx)
+		for {
+			doc, err := iter.Next()
+			if err == iterator.Done {
+					break
+			}
+			if err != nil {
+				log.Fatalf("Failed to iterate: %v", err)
+			}
+			var subscription Subscription
+			if err := doc.DataTo(&subscription); err != nil {
+				log.Fatalln("Failed to map subscription to struct: %v", err)
+			}
+			subscriptions = append(subscriptions, subscription)
+	}
+
+	return subscriptions
 }

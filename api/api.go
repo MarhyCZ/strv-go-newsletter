@@ -2,11 +2,14 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
+	"net/http"
+	"strconv"
+	"time"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/marhycz/strv-go-newsletter/environment"
-	"net/http"
-	"time"
 )
 
 type Rest struct {
@@ -39,6 +42,21 @@ func (rest *Rest) initRouter() {
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		subscriptions := rest.env.Store.GetSubscriptions(ctx)
+		err := json.NewEncoder(w).Encode(subscriptions)
+		if err != nil {
+			w.WriteHeader(http.StatusNotFound)
+		}
+	})
+
+	r.Get("/subscription/{newsletter_id}/{email}", func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		id, error := strconv.Atoi(chi.URLParam(r, "newsletter_id"))
+
+		if error != nil {
+			fmt.Println("Error during conversion")
+		return
+		}
+		subscriptions := rest.env.Store.GetSubscription(ctx, id, chi.URLParam(r, "email"))
 		err := json.NewEncoder(w).Encode(subscriptions)
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
