@@ -2,11 +2,11 @@ package store
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
+	"github.com/google/uuid"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
@@ -40,46 +40,68 @@ func NewConnection(ctx context.Context) *Store {
 
 // Its like a class method.
 func (fb *Store) GetSubscriptions(ctx context.Context) []Subscription {
-	//get all subscriptions
+	var subscriptions []Subscription
 	iter := fb.client.Collection("subscription").Documents(ctx)
+
+	for {
+    doc, err := iter.Next()
+    if err == iterator.Done {
+        break
+    }
+    if err != nil {
+			log.Fatalf("Failed to iterate: %v", err)
+    }
+    var subscription Subscription
+    if err := doc.DataTo(&subscription); err != nil {
+			log.Fatalf("Failed to map subscription to struct: %v", err)
+    }
+    subscriptions = append(subscriptions, subscription)
+	}
+	return subscriptions
+}
+
+func (fb *Store) GetSubscription(ctx context.Context, newsletter_id int, email string) []Subscription {
 	var subscriptions []Subscription
 
+	iter := fb.client.Collection("subscription").Where("newsletter_id", "==", newsletter_id).Where("email", "==", email).Documents(ctx)
 	for {
 		doc, err := iter.Next()
 		if err == iterator.Done {
-			break
+				break
 		}
 		if err != nil {
 			log.Fatalf("Failed to iterate: %v", err)
 		}
 		var subscription Subscription
-		doc.DataTo(&subscriptions)
-		if err != nil {
-			log.Fatalln("Failed to map subscription to struct: %v", err)
+		if err := doc.DataTo(&subscription); err != nil {
+			log.Fatalf("Failed to map subscription to struct: %v", err)
 		}
 		subscriptions = append(subscriptions, subscription)
 	}
-	//get subscription
-	sub := fb.client.Collection("subscription").Where("id", "==", "csBgld5GN7hn4lB0ISaX").Documents(ctx)
-	for {
-		doc, err := sub.Next()
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
-			log.Fatalf("Failed to iterate: %v", err)
-		}
-		fmt.Println(doc.Data())
+	return subscriptions
+}
+
+func (fb *Store) NewSubscription(ctx context.Context, newsletter_id int, email string) error{
+
+	id := uuid.New().String()
+	_, err := fb.client.Collection("subscription").Doc(id).Set(ctx, map[string]interface{}{
+		 "email": email,
+	   "id": id,
+	   "newsletter_id": newsletter_id,
+	})
+	if err != nil {
+	  log.Fatalf("Failed adding subscription: %v", err)
+	} 
+
+	return err
+}
+
+func (fb *Store) DeleteSubscription(ctx context.Context, id string) string{
+
+	_, err := fb.client.Collection("subscription").Doc(id).Delete(ctx)
+	if err != nil {
+	  log.Fatalf("Failed deleting subscription: %v", err)
 	}
 
-	return subscriptions
-	//new subscription TO FIX
-	/* _, _, err := fb.client.Collection("subscription").Add(ctx, map[string]interface{}{
-	     "email": "Jack@McMc.cz",
-	     "id": "239kjl21kj312ljk232",
-	     "newsletter_id": "13",
-	   })
-	   if err != nil {
-	     log.Fatalf("Failed adding alovelace: %v", err)
-	   } */
+	return "Successfully deleted"
 }
