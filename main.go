@@ -2,13 +2,15 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+
 	"github.com/marhycz/strv-go-newsletter/api"
 	"github.com/marhycz/strv-go-newsletter/environment"
 	"github.com/marhycz/strv-go-newsletter/repository/database"
 	"github.com/marhycz/strv-go-newsletter/repository/store"
-	"log"
-	"net/http"
-	"os"
 )
 
 func main() {
@@ -22,6 +24,7 @@ func main() {
 	}
 
 	controller := api.NewController(env)
+	fmt.Println("starting server")
 	if err := http.ListenAndServe(":"+os.Getenv("API_PORT"), controller); err != nil {
 		log.Fatal(err.Error())
 	}

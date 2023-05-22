@@ -4,17 +4,18 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"os"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"os"
 )
 
 //go:embed migrations/*.sql
 var migrationFs embed.FS
 
 type Database struct {
-	database *pgxpool.Pool
+	Database *pgxpool.Pool
 }
 
 // https://github.com/jackc/pgx/issues/1188
@@ -36,6 +37,7 @@ func NewConnection(ctx context.Context) *Database {
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
 		user, password, host, port, dbname)
 
+	// https://github.com/jackc/pgx/issues/875
 	db, err := pgxpool.New(ctx, connStr)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to repository: %v\n", err)
@@ -51,7 +53,7 @@ func NewConnection(ctx context.Context) *Database {
 	fmt.Println("Successfully connected to DB!")
 
 	d := &Database{
-		database: db,
+		Database: db,
 	}
 
 	return d

@@ -5,4 +5,4 @@ INSERT INTO editor (
     created_at,
     updated_at
 ) VALUES
-    (@id, @name, @email, @created_at, @updated_at)
+    (@id, @password, @email, @created_at, @updated_at);

@@ -33,6 +33,8 @@ func NewConnection(ctx context.Context) *Store {
 	fb := &Store{
 		client: client,
 	}
+
+	fmt.Println("Firestore started")
 	return fb
 }
 
