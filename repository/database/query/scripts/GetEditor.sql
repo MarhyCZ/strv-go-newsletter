@@ -5,4 +5,4 @@ SELECT
     created_at,
     updated_at
 FROM editor
-WHERE email = @email
+WHERE email = @email;

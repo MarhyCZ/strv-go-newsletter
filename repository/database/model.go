@@ -31,6 +31,7 @@ func NewPasswordReset(editorID uuid.UUID, expireTime time.Time) *PasswordReset {
 	return &PasswordReset{
 		ID:         uuid.New(),
 		EditorID:   editorID,
+		Token:      uuid.New(),
 		ExpireTime: expireTime,
 	}
 }
@@ -38,6 +39,7 @@ func NewPasswordReset(editorID uuid.UUID, expireTime time.Time) *PasswordReset {
 type PasswordReset struct {
 	ID         uuid.UUID `repository:"id"`
 	EditorID   uuid.UUID `repository:"editor_id"`
+	Token      uuid.UUID `repository:"token"`
 	ExpireTime time.Time `repository:"expire_time"`
 }
 
@@ -58,14 +60,4 @@ type Editor struct {
 	Email     string    `repository:"email"`
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
-}
-
-type NewEditorInput struct {
-	Email    string `json:"email"    validate:"required,email"`
-	Password string `json:"password" validate:"required"`
-}
-
-type LoginInput struct {
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required"`
 }

@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"regexp"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -12,11 +13,6 @@ import (
 
 var (
 	validate = validator.New()
-	pepper   []byte
-)
-
-const (
-	bcryptMaxPasswordLength = 72
 )
 
 func parseRequestBody(r *http.Request, target any) error {
@@ -86,4 +82,10 @@ func CreateNewJWT(email string) (string, time.Time, error) {
 	}
 
 	return tokenString, expirationTime, nil
+}
+
+func Validate(email string) bool {
+	emailRegex := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+	validEmail := regexp.MustCompile(emailRegex).MatchString(email)
+	return validEmail
 }

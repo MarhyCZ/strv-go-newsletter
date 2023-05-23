@@ -16,6 +16,7 @@ var (
 	ErrUserAlreadyExists    = errors.New("user already exists")
 	ErrUserDoesntExists     = errors.New("user does not exist")
 	ErrUserWrongCredentials = errors.New("wrong login credentials")
+	ErrInvalidToken         = errors.New("reset password token is invalid")
 )
 
 func (rest *Rest) routeEditor(r *chi.Mux) {
@@ -27,6 +28,7 @@ func (rest *Rest) routeEditor(r *chi.Mux) {
 		r.Post("/", rest.signup)
 	})
 	r.Route("/resetpassword", func(r chi.Router) {
+		r.Get("/", rest.requestResetPassword)
 		r.Post("/", rest.resetPassword)
 	})
 	r.Route("/logout", func(r chi.Router) {
@@ -39,7 +41,7 @@ func (rest *Rest) routeEditor(r *chi.Mux) {
 
 func (rest *Rest) signup(w http.ResponseWriter, r *http.Request) {
 
-	newEditorInput := database.NewEditorInput{}
+	newEditorInput := NewEditorInput{}
 	if err := parseRequestBody(r, &newEditorInput); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -90,7 +92,7 @@ func (rest *Rest) getEditors(w http.ResponseWriter, r *http.Request) {
 
 func (rest *Rest) login(w http.ResponseWriter, r *http.Request) {
 
-	LoginInput := database.LoginInput{}
+	LoginInput := LoginInput{}
 	if err := parseRequestBody(r, &LoginInput); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -127,10 +129,6 @@ func (rest *Rest) login(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (rest *Rest) resetPassword(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("reset email sent succesfully"))
-}
-
 func (rest *Rest) logout(w http.ResponseWriter, r *http.Request) {
 	// immediately clear the token cookie
 	http.SetCookie(w, &http.Cookie{
@@ -139,4 +137,66 @@ func (rest *Rest) logout(w http.ResponseWriter, r *http.Request) {
 	})
 	w.WriteHeader(http.StatusAccepted)
 	w.Write([]byte("logout successful"))
+}
+
+func (rest *Rest) requestResetPassword(w http.ResponseWriter, r *http.Request) {
+
+	emailInput := r.URL.Query().Get("email")
+
+	if !Validate(emailInput) {
+		http.Error(w, "Invalid email format", http.StatusBadRequest)
+		return
+	}
+
+	ctx := r.Context()
+	db := rest.env.Database.Database
+
+	e, err := database.GetEditorByEmail(ctx, db, emailInput)
+	if err != nil {
+		http.Error(w, "Email doesn't exist", http.StatusNotFound)
+		return
+	}
+
+	expirationTime := time.Now().Add(60 * time.Minute)
+	pwReset, err := database.ResetPasswordRequest(ctx, db, e.ID, expirationTime)
+	if err != nil {
+		panic(err)
+	}
+
+	w.Write([]byte(pwReset.Token.String()))
+	w.Write([]byte(pwReset.ExpireTime.String()))
+
+}
+
+func (rest *Rest) resetPassword(w http.ResponseWriter, r *http.Request) {
+
+	resetPwInput := ResetPasswordInput{}
+	if err := parseRequestBody(r, &resetPwInput); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	ctx := r.Context()
+	db := rest.env.Database.Database
+
+	//verify token
+	pwReset, err := database.GetResetPasswordRequest(ctx, db, resetPwInput.Token)
+	if err != nil || pwReset.ExpireTime.Before(time.Now()) {
+		http.Error(w, ErrInvalidToken.Error(), http.StatusForbidden)
+		return
+	}
+
+	passwordHash, err := HashPassword(resetPwInput.NewPassword)
+	if err != nil {
+		panic(err)
+	}
+
+	if err := database.UpdateEditorPassword(ctx, db, pwReset.EditorID, passwordHash); err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Password successfully changed."))
+
 }

@@ -18,4 +18,11 @@ var (
 	DeleteNewsletter string
 	//go:embed scripts/DeleteNewsletter.sql
 	ListNewsletters string
+
+	//go:embed scripts/CreatePasswordReset.sql
+	CreatePasswordReset string
+	//go:embed scripts/ResetPassword.sql
+	ResetPassword string
+	//go:embed scripts/GetPasswordReset.sql
+	GetPasswordReset string
 )
