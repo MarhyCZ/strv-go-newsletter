@@ -1,4 +1,4 @@
-package main
+package sendEmail
 
 import (
 	"fmt"
@@ -26,17 +26,9 @@ func mdToHTML(md []byte) []byte {
 	return markdown.Render(doc, renderer)
 }
 
-func main() {
-	from := mail.NewEmail("Test markdown", "vse.goproject2023@gmail.com")
-	to := mail.NewEmail("Example User", "ivansvoboda9@gmail.com")
-
-	subject := "Test markdown email 2"
-
-	//testing =purposes, read md file
-	md, err := os.ReadFile("../file.md") // just pass the file name
-	if err != nil {
-		panic(err)
-	}
+func SendNewEmail(receiverName, receiverAddress, subject string, md []byte) {
+	from := mail.NewEmail("VSE GO project 2023", "vse.goproject2023@gmail.com")
+	to := mail.NewEmail(receiverName, receiverAddress)
 
 	html := mdToHTML(md)
 	str := string(html)
@@ -50,9 +42,8 @@ func main() {
 	response, err := client.Send(message)
 	if err != nil {
 		log.Println(err)
-	} else {
-		fmt.Println(response.StatusCode)
-		fmt.Println(response.Body)
-		fmt.Println(response.Headers)
 	}
+	fmt.Println(response.StatusCode)
+	fmt.Println(response.Body)
+	fmt.Println(response.Headers)
 }
