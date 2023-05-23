@@ -5,9 +5,11 @@ go 1.20
 require github.com/jackc/pgx/v5 v5.3.1
 
 require (
+	github.com/MicahParks/keyfunc v1.9.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/leodido/go-urn v1.2.3 // indirect
+	google.golang.org/appengine/v2 v2.0.2 // indirect
 )
 
 require (
@@ -19,11 +21,12 @@ require (
 	cloud.google.com/go/longrunning v0.4.1 // indirect
 	cloud.google.com/go/storage v1.30.1 // indirect
 	firebase.google.com/go v3.13.0+incompatible
+	firebase.google.com/go/v4 v4.11.0
 	github.com/georgysavva/scany/v2 v2.0.0
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/go-playground/validator/v10 v10.13.0
 	github.com/golang-jwt/jwt/v4 v4.5.0
-	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
+	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/gomarkdown/markdown v0.0.0-20230322041520-c84983bdbf2a
 	github.com/google/go-cmp v0.5.9 // indirect
@@ -43,7 +46,7 @@ require (
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
-	golang.org/x/time v0.1.0 // indirect
+	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/api v0.123.0
 	google.golang.org/appengine v1.6.7 // indirect
