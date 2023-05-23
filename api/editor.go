@@ -85,7 +85,7 @@ func (rest *Rest) getEditors(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	for i := 0; i <= len(editors); i++ {
+	for i := 0; i < len(editors); i++ {
 		w.Write([]byte(editors[i].Email + "\n"))
 	}
 }
