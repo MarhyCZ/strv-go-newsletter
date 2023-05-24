@@ -13,6 +13,7 @@ func (rest *Rest) routeNewsletter(r *chi.Mux) {
 	r.Route("/newsletter", func(r chi.Router) {
 		r.Post("/", rest.createNewsletter)
 		r.Delete("/{newsletter_id}", rest.deleteNewsletter)
+		r.Get("/", rest.listEditorNewsletters)
 	})
 }
 

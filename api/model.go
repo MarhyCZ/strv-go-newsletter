@@ -5,9 +5,7 @@ import (
 	"github.com/google/uuid"
 )
 
-var jwtKey = []byte("my_secret_key")
-
-type Claims struct {
+type claims struct {
 	Username string `json:"username"`
 	jwt.RegisteredClaims
 }
@@ -22,7 +20,7 @@ type loginInput struct {
 	Password string `json:"password" validate:"required"`
 }
 
-type ResetPasswordInput struct {
+type resetPasswordInput struct {
 	Token       string `json:"token" validate:"required"`
 	NewPassword string `json:"new_password" validate:"required"`
 }

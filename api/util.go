@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 	"regexp"
 	"time"
 
@@ -45,7 +46,7 @@ func AuthToken(r *http.Request) (int, error) {
 	}
 
 	tknStr := c.Value
-	claims := &Claims{}
+	claims := &claims{}
 
 	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
@@ -67,7 +68,7 @@ func CreateNewJWT(email string) (string, time.Time, error) {
 	//30 minutes
 	expirationTime := time.Now().Add(30 * time.Minute)
 
-	claims := &Claims{
+	claims := &claims{
 		Username: email,
 		RegisteredClaims: jwt.RegisteredClaims{
 			// In JWT, the expiry time is expressed as unix milliseconds
@@ -76,7 +77,7 @@ func CreateNewJWT(email string) (string, time.Time, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtKey)
+	tokenString, err := token.SignedString([]byte(os.Getenv("")))
 	if err != nil {
 		return "", expirationTime, err
 	}

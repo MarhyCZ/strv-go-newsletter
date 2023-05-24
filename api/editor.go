@@ -176,7 +176,7 @@ func (rest *Rest) requestResetPassword(w http.ResponseWriter, r *http.Request) {
 
 func (rest *Rest) resetPassword(w http.ResponseWriter, r *http.Request) {
 
-	resetPwInput := ResetPasswordInput{}
+	resetPwInput := resetPasswordInput{}
 	if err := parseRequestBody(r, &resetPwInput); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
