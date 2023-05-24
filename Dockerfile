@@ -18,7 +18,7 @@ FROM alpine:latest
 
 RUN apk --no-cache add ca-certificates
 
-RUN mkdir -p /storage
+RUN mkdir -p /config
 
 COPY --from=build /newsletter /newsletter
 
