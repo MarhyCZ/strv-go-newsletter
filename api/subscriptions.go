@@ -18,7 +18,7 @@ func (rest *Rest) routeSubscriptions(r *chi.Mux) {
 
 		r.Get("/{newsletter_id}/{email}", rest.getSubscription)
 
-		r.Post("/", rest.subscribe)
+		r.Post("/subscribe/{newsletter_id}", rest.subscribe)
 
 		r.Get("/unsubscribe/{subscription_id}", rest.unsubscribe)
 	})

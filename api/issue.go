@@ -67,7 +67,7 @@ func (rest *Rest) publishIssue(w http.ResponseWriter, r *http.Request) {
 	newsletter := r.URL.Query().Get("newsletter_id")
 	name := r.URL.Query().Get("name")
 	subject := r.URL.Query().Get("subject")
-	email := r.URL.Query().Get("email")
+	email := ctx.Value("claims").(claims).Username
 	path := newsletter + "/" + name
 	body, bodyErr := io.ReadAll(r.Body)
 
