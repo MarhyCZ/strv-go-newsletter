@@ -95,5 +95,6 @@ func (rest *Rest) initRouter(){
 	})
 
 	rest.routeEditor(r)
+	rest.routeNewsletter(r)
 	rest.Mux = r
 }

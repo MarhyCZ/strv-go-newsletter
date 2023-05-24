@@ -19,10 +19,10 @@ func NewNewsletter(editorID uuid.UUID, name string, description string) *Newslet
 }
 
 type Newsletter struct {
-	ID          uuid.UUID `repository:"id"`
-	EditorID    uuid.UUID `repository:"editor_id"`
-	Name        string    `repository:"name"`
-	Description string    `repository:"description"`
+	ID          uuid.UUID `db:"id"`
+	EditorID    uuid.UUID `db:"editor_id"`
+	Name        string    `db:"name"`
+	Description string    `db:"description"`
 	CreatedAt   time.Time `db:"created_at"`
 	UpdatedAt   time.Time `db:"updated_at"`
 }
@@ -37,10 +37,10 @@ func NewPasswordReset(editorID uuid.UUID, expireTime time.Time) *PasswordReset {
 }
 
 type PasswordReset struct {
-	ID         uuid.UUID `repository:"id"`
-	EditorID   uuid.UUID `repository:"editor_id"`
-	Token      uuid.UUID `repository:"token"`
-	ExpireTime time.Time `repository:"expire_time"`
+	ID         uuid.UUID `db:"id"`
+	EditorID   uuid.UUID `db:"editor_id"`
+	Token      uuid.UUID `db:"token"`
+	ExpireTime time.Time `db:"expire_time"`
 }
 
 func NewEditor(password string, email string) *Editor {
@@ -55,9 +55,9 @@ func NewEditor(password string, email string) *Editor {
 }
 
 type Editor struct {
-	ID        uuid.UUID `repository:"id"`
-	Password  string    `repository:"password"`
-	Email     string    `repository:"email"`
+	ID        uuid.UUID `db:"id"`
+	Password  string    `db:"password"`
+	Email     string    `db:"email"`
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
 }

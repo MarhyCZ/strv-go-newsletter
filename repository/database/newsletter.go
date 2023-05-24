@@ -25,7 +25,7 @@ func CreateNewsletter(ctx context.Context, querier Querier, editorID uuid.UUID, 
 	return newsletter, nil
 }
 
-func ListEditorNewsletters(ctx context.Context, querier Querier, editorID string) ([]Newsletter, error) {
+func ListEditorNewsletters(ctx context.Context, querier Querier, editorID uuid.UUID) ([]Newsletter, error) {
 	var newsletters []Newsletter
 	if err := pgxscan.Select(ctx, querier, &newsletters, query.ListNewsletters, pgx.NamedArgs{
 		"editor_id": editorID,
@@ -35,7 +35,7 @@ func ListEditorNewsletters(ctx context.Context, querier Querier, editorID string
 	return newsletters, nil
 }
 
-func RenameNewsletter(ctx context.Context, querier Querier, newsletterID string, name string) error {
+func RenameNewsletter(ctx context.Context, querier Querier, newsletterID uuid.UUID, name string) error {
 	_, err := querier.Exec(ctx, query.RenameNewsletter, pgx.NamedArgs{
 		"id":         newsletterID,
 		"name":       name,
@@ -44,7 +44,7 @@ func RenameNewsletter(ctx context.Context, querier Querier, newsletterID string,
 	return err
 }
 
-func DeleteNewsletter(ctx context.Context, querier Querier, newsletterID string) error {
+func DeleteNewsletter(ctx context.Context, querier Querier, newsletterID uuid.UUID) error {
 	_, err := querier.Exec(ctx, query.DeleteNewsletter, pgx.NamedArgs{
 		"id": newsletterID,
 	})

@@ -41,7 +41,7 @@ func (rest *Rest) routeEditor(r *chi.Mux) {
 
 func (rest *Rest) signup(w http.ResponseWriter, r *http.Request) {
 
-	newEditorInput := NewEditorInput{}
+	newEditorInput := newEditorInput{}
 	if err := parseRequestBody(r, &newEditorInput); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -92,7 +92,7 @@ func (rest *Rest) getEditors(w http.ResponseWriter, r *http.Request) {
 
 func (rest *Rest) login(w http.ResponseWriter, r *http.Request) {
 
-	LoginInput := LoginInput{}
+	LoginInput := loginInput{}
 	if err := parseRequestBody(r, &LoginInput); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
