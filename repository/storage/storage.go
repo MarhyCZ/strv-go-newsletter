@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	"encoding/base64"
+	//"encoding/base64"
 
 	storageFn "cloud.google.com/go/storage"
 	firebase "firebase.google.com/go/v4"
@@ -88,13 +88,13 @@ func (fb *Storage) DownloadFileIntoMemory(ctx context.Context, w io.Writer, issu
 	return data, nil
 }
 
-func (fb *Storage) StreamFileUpload(ctx context.Context, w io.Writer, issue string, data string) error {
+func (fb *Storage) StreamFileUpload(ctx context.Context, w io.Writer, issue string, data []byte) error {
 	bucket, err := fb.client.DefaultBucket()
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	md, _ := base64.StdEncoding.DecodeString(data)
+	//md, _ := base64.StdEncoding.DecodeString(data)
 
 	ctx, cancel := context.WithTimeout(ctx, time.Second*50)
 	defer cancel()
@@ -104,7 +104,7 @@ func (fb *Storage) StreamFileUpload(ctx context.Context, w io.Writer, issue stri
 	wc.ContentType = "text/markdown"
 	wc.ChunkSize = 0 // note retries are not supported for chunk size 0.
 
-	if _, err := wc.Write(md); err != nil {
+	if _, err := wc.Write(data); err != nil {
 		return fmt.Errorf("Writer.Write: %w", err)
 	}
 	// Data can continue to be added to the file until the writer is closed.

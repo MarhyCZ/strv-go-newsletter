@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	sendEmail "github.com/marhycz/strv-go-newsletter/emails"
 	"github.com/marhycz/strv-go-newsletter/repository/store"
 )
 
@@ -18,7 +20,7 @@ func (rest *Rest) routeSubscriptions(r *chi.Mux) {
 
 		r.Post("/", rest.subscribe)
 
-		r.Delete("/", rest.unsubscribe)
+		r.Get("/unsubscribe/{subscription_id}", rest.unsubscribe)
 	})
 }
 
@@ -54,21 +56,33 @@ func (rest *Rest) subscribe(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&sub)
 	ctx := r.Context()
 
-	subscriptions := rest.env.Store.NewSubscription(ctx, sub.Newsletter_id, sub.Email)
+	body := []byte(`# Welcome aboard!  
+	---
+	
+	You have successfully subscribed to our newsletter,  
+	you can unsubscribe any time with the link  
+	at the bottom of each e-mail we send you.
+	
+	**Have a great day!**`)
 
-	err := json.NewEncoder(w).Encode(subscriptions)
+	subscriptions, subErr := rest.env.Store.NewSubscription(ctx, sub.Newsletter_id, sub.Email)
+
+	pattern := regexp.MustCompile("(.*)@")
+	subName := pattern.FindString(sub.Email)
+
+	sendEmail.SendNewEmail(subName, sub.Email, "Newsletter: Successfully subscribed to newsletter", body, subscriptions)
+
+	err := json.NewEncoder(w).Encode(subErr)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 	}
 }
 func (rest *Rest) unsubscribe(w http.ResponseWriter, r *http.Request) {
 
-	var sub store.Subscription
-
-	json.NewDecoder(r.Body).Decode(&sub)
+	id := chi.URLParam(r, "subscription_id")
 	ctx := r.Context()
 
-	subscriptions := rest.env.Store.DeleteSubscription(ctx, sub.Id)
+	subscriptions := rest.env.Store.DeleteSubscription(ctx, id)
 
 	err := json.NewEncoder(w).Encode(subscriptions)
 	if err != nil {
