@@ -17,10 +17,9 @@ import (
 
 func (rest *Rest) routeIssues(r *chi.Mux) {
 	r.Route("/issues", func(r chi.Router) {
+		r.Use(editorOnly)
 		r.Get("/", rest.listOfIssues)
-
 		r.Get("/issue", rest.getIssue)
-
 		r.Post("/issue", rest.publishIssue)
 	})
 }
@@ -78,11 +77,6 @@ func (rest *Rest) publishIssue(w http.ResponseWriter, r *http.Request) {
 
 	if newsletter == "" || name == "" {
 		w.WriteHeader(http.StatusForbidden)
-	}
-
-	if cA, err := AuthToken(r); err != nil {
-		w.WriteHeader(cA)
-		w.Write([]byte(strconv.Itoa(cA) + ": " + http.StatusText(cA)))
 	}
 
 	/* cE, editorCookieErr := r.Cookie("Editor")

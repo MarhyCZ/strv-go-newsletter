@@ -36,31 +36,31 @@ func CheckPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-func AuthToken(r *http.Request) (int, error) {
+func authToken(r *http.Request) (*claims, int) {
 	c, err := r.Cookie("token")
 	if err != nil {
 		if err == http.ErrNoCookie {
-			return http.StatusUnauthorized, err
+			return nil, http.StatusUnauthorized
 		}
-		return http.StatusBadRequest, err
+		return nil, http.StatusBadRequest
 	}
 
 	tknStr := c.Value
 	claims := &claims{}
 
 	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
+		return os.Getenv("JWT_KEY"), nil
 	})
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
-			return http.StatusUnauthorized, err
+			return nil, http.StatusUnauthorized
 		}
-		return http.StatusBadRequest, err
+		return nil, http.StatusBadRequest
 	}
 	if !tkn.Valid {
-		return http.StatusBadRequest, err
+		return claims, http.StatusBadRequest
 	}
-	return http.StatusAccepted, nil
+	return claims, http.StatusAccepted
 }
 
 func CreateNewJWT(email string) (string, time.Time, error) {
@@ -77,7 +77,7 @@ func CreateNewJWT(email string) (string, time.Time, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(os.Getenv("")))
+	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_KEY")))
 	if err != nil {
 		return "", expirationTime, err
 	}

@@ -35,6 +35,7 @@ func (rest *Rest) routeEditor(r *chi.Mux) {
 		r.Get("/", rest.logout)
 	})
 	r.Route("/getEditors", func(r chi.Router) {
+		r.Use(editorOnly)
 		r.Get("/", rest.getEditors)
 	})
 }
@@ -72,11 +73,6 @@ func (rest *Rest) signup(w http.ResponseWriter, r *http.Request) {
 }
 
 func (rest *Rest) getEditors(w http.ResponseWriter, r *http.Request) {
-	if c, err := AuthToken(r); err != nil {
-		w.WriteHeader(c)
-		w.Write([]byte(strconv.Itoa(c) + ": " + http.StatusText(c)))
-		return
-	}
 
 	db := rest.env.Database.Database
 	editors, err := database.ListEditors(r.Context(), db)
