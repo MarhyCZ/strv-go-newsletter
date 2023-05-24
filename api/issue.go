@@ -95,9 +95,7 @@ func (rest *Rest) publishIssue(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 	}
 
-	editorID := editor.ID.String()
-
-	editorsNewsletters, newsErr := database.ListEditorNewsletters(ctx, db, editorID)
+	editorsNewsletters, newsErr := database.ListEditorNewsletters(ctx, db, editor.ID)
 	if newsErr != nil {
 		w.WriteHeader(http.StatusNotFound)
 	}
