@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"github.com/marhycz/strv-go-newsletter/repository/database"
 	"net/http"
 	"os"
 	"regexp"
@@ -63,13 +64,14 @@ func authToken(r *http.Request) (*claims, int) {
 	return claims, http.StatusAccepted
 }
 
-func CreateNewJWT(email string) (string, time.Time, error) {
+func CreateNewJWT(editor *database.Editor) (string, time.Time, error) {
 
 	//30 minutes
 	expirationTime := time.Now().Add(30 * time.Minute)
 
 	claims := &claims{
-		Username: email,
+		Username: editor.Email,
+		EditorID: editor.ID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			// In JWT, the expiry time is expressed as unix milliseconds
 			ExpiresAt: jwt.NewNumericDate(expirationTime),

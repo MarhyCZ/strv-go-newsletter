@@ -6,7 +6,8 @@ import (
 )
 
 type claims struct {
-	Username string `json:"username"`
+	Username string    `json:"username"`
+	EditorID uuid.UUID `json:"editor_id"`
 	jwt.RegisteredClaims
 }
 
@@ -26,13 +27,17 @@ type resetPasswordInput struct {
 }
 
 type createNewsletterInput struct {
-	EditorID    uuid.UUID `json:"editor_id" validate:"required"`
-	Name        string    `json:"name" validate:"required"`
-	Description string    `json:"description" validate:"required"`
+	Name        string `json:"name" validate:"required"`
+	Description string `json:"description" validate:"required"`
 }
 
 type deleteNewsletterInput struct {
 	ID uuid.UUID `json:"id" validate:"required"`
+}
+
+type renameNewsletterInput struct {
+	ID   uuid.UUID `json:"id" validate:"required"`
+	Name string    `json:"description" validate:"required"`
 }
 
 type listEditorNewslettersInput struct {

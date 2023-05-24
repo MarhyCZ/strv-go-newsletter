@@ -108,7 +108,7 @@ func (rest *Rest) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, expDate, err := CreateNewJWT(LoginInput.Email)
+	token, expDate, err := CreateNewJWT(e)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(strconv.Itoa(http.StatusInternalServerError) + ": " + http.StatusText(http.StatusInternalServerError)))

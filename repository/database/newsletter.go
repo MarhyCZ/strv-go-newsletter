@@ -50,3 +50,13 @@ func DeleteNewsletter(ctx context.Context, querier Querier, newsletterID uuid.UU
 	})
 	return err
 }
+
+func GetNewsletter(ctx context.Context, querier Querier, newsletterID uuid.UUID) (*Newsletter, error) {
+	newsletter := &Newsletter{}
+	if err := pgxscan.Get(ctx, querier, newsletter, query.ListNewsletters, pgx.NamedArgs{
+		"id": newsletterID,
+	}); err != nil {
+		return nil, err
+	}
+	return newsletter, nil
+}
