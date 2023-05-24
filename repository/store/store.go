@@ -45,30 +45,9 @@ func (fb *Store) GetSubscriptions(ctx context.Context) []Subscription {
 	iter := fb.client.Collection("subscription").Documents(ctx)
 
 	for {
-    doc, err := iter.Next()
-    if err == iterator.Done {
-        break
-    }
-    if err != nil {
-			log.Fatalf("Failed to iterate: %v", err)
-    }
-    var subscription Subscription
-    if err := doc.DataTo(&subscription); err != nil {
-			log.Fatalf("Failed to map subscription to struct: %v", err)
-    }
-    subscriptions = append(subscriptions, subscription)
-	}
-	return subscriptions
-}
-
-func (fb *Store) GetSubscription(ctx context.Context, newsletter_id int, email string) []Subscription {
-	var subscriptions []Subscription
-
-	iter := fb.client.Collection("subscription").Where("newsletter_id", "==", newsletter_id).Where("email", "==", email).Documents(ctx)
-	for {
 		doc, err := iter.Next()
 		if err == iterator.Done {
-				break
+			break
 		}
 		if err != nil {
 			log.Fatalf("Failed to iterate: %v", err)
@@ -82,26 +61,69 @@ func (fb *Store) GetSubscription(ctx context.Context, newsletter_id int, email s
 	return subscriptions
 }
 
-func (fb *Store) NewSubscription(ctx context.Context, newsletter_id int, email string) error{
+// Its like a class method.
+func (fb *Store) GetNewsletterSubscriptions(ctx context.Context, newsletter_id int) []Subscription {
+	var subscriptions []Subscription
+	iter := fb.client.Collection("subscription").Where("newsletter_id", "==", newsletter_id).Documents(ctx)
+
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			log.Fatalf("Failed to iterate: %v", err)
+		}
+		var subscription Subscription
+		if err := doc.DataTo(&subscription); err != nil {
+			log.Fatalf("Failed to map subscription to struct: %v", err)
+		}
+		subscriptions = append(subscriptions, subscription)
+	}
+	return subscriptions
+}
+
+func (fb *Store) GetSubscription(ctx context.Context, newsletter_id int, email string) []Subscription {
+	var subscriptions []Subscription
+
+	iter := fb.client.Collection("subscription").Where("newsletter_id", "==", newsletter_id).Where("email", "==", email).Documents(ctx)
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			log.Fatalf("Failed to iterate: %v", err)
+		}
+		var subscription Subscription
+		if err := doc.DataTo(&subscription); err != nil {
+			log.Fatalf("Failed to map subscription to struct: %v", err)
+		}
+		subscriptions = append(subscriptions, subscription)
+	}
+	return subscriptions
+}
+
+func (fb *Store) NewSubscription(ctx context.Context, newsletter_id int, email string) (string, error) {
 
 	id := uuid.New().String()
 	_, err := fb.client.Collection("subscription").Doc(id).Set(ctx, map[string]interface{}{
-		 "email": email,
-	   "id": id,
-	   "newsletter_id": newsletter_id,
+		"email":         email,
+		"id":            id,
+		"newsletter_id": newsletter_id,
 	})
 	if err != nil {
-	  log.Fatalf("Failed adding subscription: %v", err)
-	} 
+		log.Fatalf("Failed adding subscription: %v", err)
+	}
 
-	return err
+	return id, err
 }
 
-func (fb *Store) DeleteSubscription(ctx context.Context, id string) string{
+func (fb *Store) DeleteSubscription(ctx context.Context, id string) string {
 
 	_, err := fb.client.Collection("subscription").Doc(id).Delete(ctx)
 	if err != nil {
-	  log.Fatalf("Failed deleting subscription: %v", err)
+		log.Fatalf("Failed deleting subscription: %v", err)
 	}
 
 	return "Successfully deleted"

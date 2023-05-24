@@ -125,6 +125,12 @@ func (rest *Rest) login(w http.ResponseWriter, r *http.Request) {
 		Expires: expDate,
 	})
 
+	http.SetCookie(w, &http.Cookie{
+		Name:    "editor",
+		Value:   LoginInput.Email,
+		Expires: expDate,
+	})
+
 	w.Write([]byte("JTW token: " + token))
 
 }

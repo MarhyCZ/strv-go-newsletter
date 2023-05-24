@@ -10,6 +10,7 @@ import (
 	"github.com/marhycz/strv-go-newsletter/api"
 	"github.com/marhycz/strv-go-newsletter/environment"
 	"github.com/marhycz/strv-go-newsletter/repository/database"
+	"github.com/marhycz/strv-go-newsletter/repository/storage"
 	"github.com/marhycz/strv-go-newsletter/repository/store"
 )
 
@@ -21,6 +22,7 @@ func main() {
 	env := &environment.Env{
 		Database: database.NewConnection(ctx),
 		Store:    store.NewConnection(ctx),
+		Storage: storage.NewConnection(ctx),
 	}
 
 	controller := api.NewController(env)
