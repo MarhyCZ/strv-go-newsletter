@@ -12,7 +12,8 @@ func editorOnly(next http.Handler) http.Handler {
 		w.WriteHeader(cA)
 		w.Write([]byte(strconv.Itoa(cA) + ": " + http.StatusText(cA)))
 		if claims != nil {
-			ctx := context.WithValue(r.Context(), "claims", claims)
+			print(claims.EditorID.String())
+			ctx := context.WithValue(r.Context(), "claims", *claims)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		}
 	})

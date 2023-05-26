@@ -50,7 +50,7 @@ func authToken(r *http.Request) (*claims, int) {
 	claims := &claims{}
 
 	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
-		return os.Getenv("JWT_KEY"), nil
+		return []byte(os.Getenv("JWT_KEY")), nil
 	})
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
