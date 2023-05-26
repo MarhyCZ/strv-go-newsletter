@@ -31,15 +31,6 @@ type createNewsletterInput struct {
 	Description string `json:"description" validate:"required"`
 }
 
-type deleteNewsletterInput struct {
-	ID uuid.UUID `json:"id" validate:"required"`
-}
-
 type renameNewsletterInput struct {
-	ID   uuid.UUID `json:"id" validate:"required"`
-	Name string    `json:"description" validate:"required"`
-}
-
-type listEditorNewslettersInput struct {
-	EditorID uuid.UUID `json:"editor_id" validate:"required"`
+	Name string `json:"name" validate:"required"`
 }
