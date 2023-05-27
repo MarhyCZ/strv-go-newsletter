@@ -14,7 +14,7 @@ import (
 
 func (rest *Rest) routeSubscriptions(r *chi.Mux) {
 	r.Route("/subscriptions", func(r chi.Router) {
-		r.Get("/", rest.listOfSubscriptions)
+		r.With(editorOnly).Get("/", rest.listOfSubscriptions)
 
 		r.Get("/{newsletter_id}/{email}", rest.getSubscription)
 
