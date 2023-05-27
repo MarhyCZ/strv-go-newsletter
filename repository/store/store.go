@@ -83,7 +83,7 @@ func (fb *Store) GetNewsletterSubscriptions(ctx context.Context, newsletter_id i
 	return subscriptions
 }
 
-func (fb *Store) GetSubscription(ctx context.Context, newsletter_id int, email string) []Subscription {
+func (fb *Store) GetSubscription(ctx context.Context, newsletter_id uuid.UUID, email string) []Subscription {
 	var subscriptions []Subscription
 
 	iter := fb.client.Collection("subscription").Where("newsletter_id", "==", newsletter_id).Where("email", "==", email).Documents(ctx)
@@ -104,7 +104,7 @@ func (fb *Store) GetSubscription(ctx context.Context, newsletter_id int, email s
 	return subscriptions
 }
 
-func (fb *Store) NewSubscription(ctx context.Context, newsletter_id int, email string) (string, error) {
+func (fb *Store) NewSubscription(ctx context.Context, newsletter_id uuid.UUID, email string) (string, error) {
 
 	id := uuid.New().String()
 	_, err := fb.client.Collection("subscription").Doc(id).Set(ctx, map[string]interface{}{
@@ -119,9 +119,9 @@ func (fb *Store) NewSubscription(ctx context.Context, newsletter_id int, email s
 	return id, err
 }
 
-func (fb *Store) DeleteSubscription(ctx context.Context, id string) string {
+func (fb *Store) DeleteSubscription(ctx context.Context, id uuid.UUID) string {
 
-	_, err := fb.client.Collection("subscription").Doc(id).Delete(ctx)
+	_, err := fb.client.Collection("subscription").Doc(id.String()).Delete(ctx)
 	if err != nil {
 		log.Fatalf("Failed deleting subscription: %v", err)
 	}
