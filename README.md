@@ -15,4 +15,4 @@ You can also use docker-compose.yml which builds the container
 Production build is available on domain strv.mb.marstad.cz
 
 ## Documentation
-API documentation is available on swagger hub.
+API documentation is available in swagger.json as Swagger V2.
