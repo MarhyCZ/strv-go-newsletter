@@ -55,9 +55,16 @@ func (rest *Rest) deleteNewsletter(w http.ResponseWriter, r *http.Request) {
 
 	db := rest.env.Database.Database
 	newsletter, err := database.GetNewsletter(ctx, db, newsletterID)
+
+	if newsletter == nil {
+		response := fmt.Sprintf("The newsletter with ID: %s does not exist.", newsletter.ID)
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(response))
+		return
+	}
 	if newsletter.EditorID != editorID || err != nil {
 		response := fmt.Sprintf("The newsletter with ID: %s was not found in your account.", newsletter.ID)
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		w.Write([]byte(response))
 		return
 	}
