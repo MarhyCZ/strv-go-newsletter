@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -10,6 +11,10 @@ import (
 	"github.com/go-chi/chi/v5"
 	sendEmail "github.com/marhycz/strv-go-newsletter/emails"
 	"github.com/marhycz/strv-go-newsletter/repository/store"
+)
+
+var (
+	ErrAlreadySubscribed = errors.New("You are already subscribed to this newsletter")
 )
 
 func (rest *Rest) routeSubscriptions(r *chi.Mux) {
@@ -56,6 +61,12 @@ func (rest *Rest) subscribe(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&sub)
 	ctx := r.Context()
 
+	currSubscriptions := rest.env.Store.GetSubscription(ctx, sub.Newsletter_id, sub.Email)
+	if len(currSubscriptions) > 0 {
+		w.Write([]byte(ErrAlreadySubscribed.Error()))
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
 	body := []byte(`# Welcome aboard!  
 	---
 	
