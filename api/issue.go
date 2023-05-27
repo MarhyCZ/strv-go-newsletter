@@ -3,35 +3,41 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ggicci/httpin"
+	"github.com/go-chi/chi/v5"
+	sendEmail "github.com/marhycz/strv-go-newsletter/emails"
+	"github.com/marhycz/strv-go-newsletter/repository/database"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"regexp"
-	"strconv"
-
-	"github.com/go-chi/chi/v5"
-	sendEmail "github.com/marhycz/strv-go-newsletter/emails"
-	"github.com/marhycz/strv-go-newsletter/repository/database"
 )
 
 func (rest *Rest) routeIssues(r *chi.Mux) {
 	r.Route("/issues", func(r chi.Router) {
 		r.Use(editorOnly)
-		r.Get("/", rest.listOfIssues)
-		r.Get("/issue", rest.getIssue)
-		r.Post("/issue", rest.publishIssue)
+		r.With(
+			httpin.NewInput(listOfIssuesInput{}),
+		).Get("/", rest.listOfIssues)
+		r.With(
+			httpin.NewInput(getIssueInput{}),
+		).Get("/{newsletter_id}/{name}", rest.getIssue)
+		r.With(
+			httpin.NewInput(publishIssueInput{}),
+		).Post("/", rest.publishIssue)
 	})
 }
 
 func (rest *Rest) listOfIssues(w http.ResponseWriter, r *http.Request) {
-	newsletter := r.URL.Query().Get("newsletter_id")
+	ctx := r.Context()
+	input := ctx.Value(httpin.Input).(*listOfIssuesInput)
+	newsletter := input.NewsletterID.String()
 
 	if newsletter != "" {
 		newsletter = newsletter + "/"
 	}
 
-	ctx := r.Context()
 	subscriptions, listErr := rest.env.Storage.GetIssuesList(ctx, os.Stdout, "/", newsletter)
 
 	if listErr != nil {
@@ -44,15 +50,11 @@ func (rest *Rest) listOfIssues(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func (rest *Rest) getIssue(w http.ResponseWriter, r *http.Request) {
-	newsletter := r.URL.Query().Get("newsletter_id")
-	name := r.URL.Query().Get("name")
-	path := newsletter + "/" + name
-
-	if newsletter == "" || name == "" {
-		w.WriteHeader(http.StatusForbidden)
-	}
-
 	ctx := r.Context()
+	input := ctx.Value(httpin.Input).(*getIssueInput)
+	newsletter := input.NewsletterID.String()
+	path := newsletter + "/" + input.Name
+
 	subscriptions, downlFailure := rest.env.Storage.DownloadFileIntoMemory(ctx, os.Stdout, path)
 
 	if downlFailure != nil {
@@ -69,19 +71,14 @@ func (rest *Rest) publishIssue(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	db := rest.env.Database.Database
 
-	newsletter := r.URL.Query().Get("newsletter_id")
-	name := r.URL.Query().Get("name")
-	subject := r.URL.Query().Get("subject")
+	input := ctx.Value(httpin.Input).(*publishIssueInput)
+	newsletter := input.NewsletterID.String()
 	email := ctx.Value("claims").(claims).Username
-	path := newsletter + "/" + name
+	path := newsletter + "/" + input.Name
 	body, bodyErr := io.ReadAll(r.Body)
 
 	if bodyErr != nil {
 		log.Fatalln(bodyErr)
-	}
-
-	if newsletter == "" || name == "" {
-		w.WriteHeader(http.StatusForbidden)
 	}
 
 	/* cE, editorCookieErr := r.Cookie("Editor")
@@ -107,18 +104,12 @@ func (rest *Rest) publishIssue(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 	}
 
-	newsletterInt, errConv := strconv.Atoi(newsletter)
-
-	if errConv != nil {
-		w.WriteHeader(http.StatusNotFound)
-	}
-
-	it := rest.env.Store.GetNewsletterSubscriptions(ctx, newsletterInt)
+	it := rest.env.Store.GetNewsletterSubscriptions(ctx, input.NewsletterID)
 	for _, element := range it {
 		pattern := regexp.MustCompile("(.*)@")
 		subName := pattern.FindString(element.Email)
 
-		sendEmail.SendNewEmail(subName, element.Email, "Newsletter: "+subject, body, element.Id)
+		sendEmail.SendNewEmail(subName, element.Email, "Newsletter: "+input.Subject, body, element.Id)
 	}
 
 }

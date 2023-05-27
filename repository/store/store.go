@@ -62,7 +62,7 @@ func (fb *Store) GetSubscriptions(ctx context.Context) []Subscription {
 }
 
 // Its like a class method.
-func (fb *Store) GetNewsletterSubscriptions(ctx context.Context, newsletter_id int) []Subscription {
+func (fb *Store) GetNewsletterSubscriptions(ctx context.Context, newsletter_id uuid.UUID) []Subscription {
 	var subscriptions []Subscription
 	iter := fb.client.Collection("subscription").Where("newsletter_id", "==", newsletter_id).Documents(ctx)
 

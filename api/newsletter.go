@@ -12,7 +12,7 @@ import (
 
 func (rest *Rest) routeNewsletter(r *chi.Mux) {
 	// RESTy routes for "newsletters" resource
-	r.Route("/newsletter", func(r chi.Router) {
+	r.Route("/newsletters", func(r chi.Router) {
 		r.Use(editorOnly)
 		r.Post("/", rest.createNewsletter)
 		r.Get("/", rest.listEditorNewsletters)
