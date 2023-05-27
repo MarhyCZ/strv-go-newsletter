@@ -45,11 +45,13 @@ func NewConnection(ctx context.Context) *Storage {
 	// for more details.storage.go
 }
 
-func (fb *Storage) GetIssuesList(ctx context.Context, w io.Writer, delim string, prefix string) error {
+func (fb *Storage) GetIssuesList(ctx context.Context, w io.Writer, delim string, prefix string) ([]string, error) {
 	bucket, err := fb.client.DefaultBucket()
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	var issues []string
 
 	it := bucket.Objects(ctx, &storageFn.Query{
 		Prefix:    prefix,
@@ -61,11 +63,12 @@ func (fb *Storage) GetIssuesList(ctx context.Context, w io.Writer, delim string,
 			break
 		}
 		if err != nil {
-			return fmt.Errorf("Bucket(%v).Objects: %w", bucket, err)
+			return nil, fmt.Errorf("Bucket(%v).Objects: %w", bucket, err)
 		}
-		fmt.Fprintln(w, attrs.Name)
+
+		issues = append(issues, attrs.Name)
 	}
-	return nil
+	return issues, nil
 }
 
 func (fb *Storage) DownloadFileIntoMemory(ctx context.Context, w io.Writer, issue string) ([]byte, error) {

@@ -32,7 +32,12 @@ func (rest *Rest) listOfIssues(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
-	subscriptions := rest.env.Storage.GetIssuesList(ctx, os.Stdout, "/", newsletter)
+	subscriptions, listErr := rest.env.Storage.GetIssuesList(ctx, os.Stdout, "/", newsletter)
+
+	if listErr != nil {
+		w.WriteHeader(http.StatusNoContent)
+	}
+
 	err := json.NewEncoder(w).Encode(subscriptions)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
