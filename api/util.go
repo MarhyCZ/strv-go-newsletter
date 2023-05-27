@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
 	"github.com/marhycz/strv-go-newsletter/repository/database"
 	"net/http"
 	"os"
@@ -25,6 +26,11 @@ func parseRequestBody(r *http.Request, target any) error {
 		return err
 	}
 	return nil
+}
+
+// For httpin because it does not support uuid by default
+func decodeUUID(value string) (interface{}, error) {
+	return uuid.Parse(value)
 }
 
 func HashPassword(password string) (string, error) {

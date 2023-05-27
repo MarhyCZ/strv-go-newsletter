@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ggicci/httpin"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/marhycz/strv-go-newsletter/repository/database"
@@ -15,7 +16,9 @@ func (rest *Rest) routeNewsletter(r *chi.Mux) {
 		r.Use(editorOnly)
 		r.Post("/", rest.createNewsletter)
 		r.Get("/", rest.listEditorNewsletters)
-		r.Delete("/{newsletter_id}", rest.deleteNewsletter)
+		r.With(
+			httpin.NewInput(deleteNewsletterInput{}),
+		).Delete("/{newsletter_id}", rest.deleteNewsletter)
 		r.Put("/{newsletter_id}", rest.renameNewsletter)
 	})
 }
@@ -41,23 +44,15 @@ func (rest *Rest) createNewsletter(w http.ResponseWriter, r *http.Request) {
 }
 
 func (rest *Rest) deleteNewsletter(w http.ResponseWriter, r *http.Request) {
-	newsletterID, err := uuid.Parse(chi.URLParam(r, "newsletter_id"))
-
-	if err != nil {
-		response := fmt.Sprintf("Wrong newsletter ID in URL")
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(response))
-		return
-	}
-
 	ctx := r.Context()
+	input := ctx.Value(httpin.Input).(*deleteNewsletterInput)
 	editorID := ctx.Value("claims").(claims).EditorID
 
 	db := rest.env.Database.Database
-	newsletter, err := database.GetNewsletter(ctx, db, newsletterID)
+	newsletter, err := database.GetNewsletter(ctx, db, input.NewsletterID)
 
 	if newsletter == nil {
-		response := fmt.Sprintf("The newsletter with ID: %s does not exist.", newsletter.ID)
+		response := fmt.Sprintf("The newsletter with ID: %s does not exist.", input.NewsletterID)
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte(response))
 		return
@@ -69,7 +64,7 @@ func (rest *Rest) deleteNewsletter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = database.DeleteNewsletter(ctx, db, newsletterID)
+	err = database.DeleteNewsletter(ctx, db, newsletter.ID)
 	if err != nil {
 		response := fmt.Sprintf("The newsletter with ID: %s was not deleted.", newsletter.ID)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -77,7 +72,7 @@ func (rest *Rest) deleteNewsletter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := fmt.Sprintf("The newsletter with ID: %s was successfully deleted.", newsletterID)
+	response := fmt.Sprintf("The newsletter with ID: %s was successfully deleted.", newsletter.ID)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(response))
 }

@@ -3,14 +3,12 @@ package api
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
-	"net/http"
-	"regexp"
-	"strconv"
-
+	"github.com/ggicci/httpin"
 	"github.com/go-chi/chi/v5"
 	sendEmail "github.com/marhycz/strv-go-newsletter/emails"
 	"github.com/marhycz/strv-go-newsletter/repository/store"
+	"net/http"
+	"regexp"
 )
 
 var (
@@ -21,11 +19,15 @@ func (rest *Rest) routeSubscriptions(r *chi.Mux) {
 	r.Route("/subscriptions", func(r chi.Router) {
 		r.With(editorOnly).Get("/", rest.listOfSubscriptions)
 
-		r.Get("/{newsletter_id}/{email}", rest.getSubscription)
+		r.With(
+			httpin.NewInput(getSubscriptionInput{}),
+		).Get("/{newsletter_id}/{email}", rest.getSubscription)
 
 		r.Post("/subscribe/{newsletter_id}", rest.subscribe)
 
-		r.Get("/unsubscribe/{subscription_id}", rest.unsubscribe)
+		r.With(
+			httpin.NewInput(unsubcribeInput{}),
+		).Get("/unsubscribe/{subscription_id}", rest.unsubscribe)
 	})
 }
 
@@ -40,15 +42,10 @@ func (rest *Rest) listOfSubscriptions(w http.ResponseWriter, r *http.Request) {
 }
 
 func (rest *Rest) getSubscription(w http.ResponseWriter, r *http.Request) {
-
 	ctx := r.Context()
-	id, error := strconv.Atoi(chi.URLParam(r, "newsletter_id"))
+	input := ctx.Value(httpin.Input).(*getSubscriptionInput)
 
-	if error != nil {
-		fmt.Println("Error during conversion")
-		return
-	}
-	subscriptions := rest.env.Store.GetSubscription(ctx, id, chi.URLParam(r, "email"))
+	subscriptions := rest.env.Store.GetSubscription(ctx, input.NewsletterID, input.Email)
 	err := json.NewEncoder(w).Encode(subscriptions)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
@@ -89,11 +86,10 @@ func (rest *Rest) subscribe(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func (rest *Rest) unsubscribe(w http.ResponseWriter, r *http.Request) {
-
-	id := chi.URLParam(r, "subscription_id")
 	ctx := r.Context()
+	input := ctx.Value(httpin.Input).(*unsubcribeInput)
 
-	subscriptions := rest.env.Store.DeleteSubscription(ctx, id)
+	subscriptions := rest.env.Store.DeleteSubscription(ctx, input.SubscriptionID)
 
 	err := json.NewEncoder(w).Encode(subscriptions)
 	if err != nil {

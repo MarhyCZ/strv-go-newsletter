@@ -34,3 +34,16 @@ type createNewsletterInput struct {
 type renameNewsletterInput struct {
 	Name string `json:"name" validate:"required"`
 }
+
+type deleteNewsletterInput struct {
+	NewsletterID uuid.UUID `in:"path=newsletter_id;required;decoder=uuid"`
+}
+
+type getSubscriptionInput struct {
+	NewsletterID uuid.UUID `in:"path=newsletter_id;required;decoder=uuid"`
+	Email        string    `in:"path=email;required"`
+}
+
+type unsubcribeInput struct {
+	SubscriptionID uuid.UUID `in:"path=subscription_id;required;decoder=uuid"`
+}

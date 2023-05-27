@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/ggicci/httpin"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -22,6 +23,10 @@ func NewController(env *environment.Env) *Rest {
 }
 
 func (rest *Rest) initRouter() {
+	// registering path executor needs to start before chi routes
+	httpin.UseGochiURLParam("path", chi.URLParam)
+	httpin.RegisterNamedDecoder("uuid", httpin.ValueTypeDecoderFunc(decodeUUID))
+
 	r := chi.NewRouter()
 
 	// A good base middleware stack
