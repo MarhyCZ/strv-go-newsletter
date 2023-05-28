@@ -18,19 +18,12 @@
     "/newsletters": {
       "post": {
         "summary": "Create newsletter",
-        "description": "",
+        "description": "Creates a new newsletter, that can be then used to create issues and register subscribers.\n\nYou need to be signed in.",
         "operationId": "24462e1f-8cc5-43e8-a7c6-d5f231ff839b",
         "consumes": [
           "application/json"
         ],
         "parameters": [
-          {
-            "type": "string",
-            "default": "",
-            "name": "Cookie",
-            "required": false,
-            "in": "header"
-          },
           {
             "required": false,
             "schema": {
@@ -49,40 +42,25 @@
       },
       "get": {
         "summary": "List newsletters",
-        "description": "",
+        "description": "Lists all your newsletters.\n\nYou need to be signed in.",
         "operationId": "493e0941-d1f6-4c11-9cbe-6743591fbbb4",
-        "parameters": [
-          {
-            "type": "string",
-            "default": "",
-            "name": "Cookie",
-            "required": false,
-            "in": "header"
-          }
-        ],
         "responses": {
           "default": {
             "description": "no response description was provided for this operation"
           }
-        }
+        },
+        "parameters": []
       }
     },
     "/newsletters/efa09ffa-43e0-4c75-ab84-1933255dd3ed": {
       "put": {
         "summary": "Rename newsletter",
-        "description": "",
+        "description": "Renames a newsletter to your new desired name.\n\nYou need to be signed in.",
         "operationId": "b6d35e89-0bdc-4d0e-9e80-1f6f3661df6d",
         "consumes": [
           "application/json"
         ],
         "parameters": [
-          {
-            "type": "string",
-            "default": "",
-            "name": "Cookie",
-            "required": false,
-            "in": "header"
-          },
           {
             "required": false,
             "schema": {
@@ -103,43 +81,27 @@
     "/newsletters/56645e34-2570-4735-84c8-e797fe3b0707": {
       "delete": {
         "summary": "Delete newsletter",
-        "description": "Deletes a newsletter from database.",
+        "description": "Deletes a newsletter from database.\n\nEditor needs to be an owner of the newsletter.\nYou need to be signed in.",
         "operationId": "56a636c9-98f5-4272-9d7f-56c3f5db601c",
-        "parameters": [
-          {
-            "type": "string",
-            "default": "",
-            "name": "Cookie",
-            "required": false,
-            "in": "header"
-          }
-        ],
         "responses": {
           "default": {
             "description": "no response description was provided for this operation"
           }
-        }
+        },
+        "parameters": []
       }
     },
     "/logout": {
       "get": {
-        "summary": "Request",
+        "summary": "Logout",
         "description": "Clears the login token",
         "operationId": "8e0ae9eb-012e-4f73-8e40-672ec6503861",
-        "parameters": [
-          {
-            "type": "string",
-            "default": "",
-            "name": "Cookie",
-            "required": false,
-            "in": "header"
-          }
-        ],
         "responses": {
           "default": {
             "description": "no response description was provided for this operation"
           }
-        }
+        },
+        "parameters": []
       }
     },
     "/resetpassword": {
@@ -148,13 +110,6 @@
         "description": "",
         "operationId": "f5a7aeca-9a9f-4ede-a9b4-79281126e98d",
         "parameters": [
-          {
-            "type": "string",
-            "default": "",
-            "name": "Cookie",
-            "required": false,
-            "in": "header"
-          },
           {
             "type": "string",
             "default": "test@gmail.com",
@@ -177,13 +132,6 @@
           "application/json"
         ],
         "parameters": [
-          {
-            "type": "string",
-            "default": "",
-            "name": "Cookie",
-            "required": false,
-            "in": "header"
-          },
           {
             "type": "string",
             "default": "test@gmail.com",
@@ -218,13 +166,6 @@
         ],
         "parameters": [
           {
-            "type": "string",
-            "default": "",
-            "name": "Cookie",
-            "required": false,
-            "in": "header"
-          },
-          {
             "required": false,
             "schema": {
               "type": "string",
@@ -244,19 +185,12 @@
     "/signup": {
       "post": {
         "summary": "Signup",
-        "description": "Gets a JWT token and saves it into a cookies:\n\"editor\" and \"token\".",
+        "description": "Registers a new editor. ",
         "operationId": "e9e7a5e0-98d4-4e4c-b193-8eb963ccdf2c",
         "consumes": [
           "application/json"
         ],
         "parameters": [
-          {
-            "type": "string",
-            "default": "",
-            "name": "Cookie",
-            "required": false,
-            "in": "header"
-          },
           {
             "required": false,
             "schema": {
@@ -274,7 +208,7 @@
         }
       }
     },
-    "/issues/": {
+    "/issues": {
       "post": {
         "summary": "Publish Issue",
         "description": "",
@@ -283,13 +217,6 @@
           "text/plain"
         ],
         "parameters": [
-          {
-            "type": "string",
-            "default": "",
-            "name": "Cookie",
-            "required": false,
-            "in": "header"
-          },
           {
             "type": "string",
             "default": "3ee18ccf-7ccd-4a93-8095-3ccb23da97a5",
@@ -326,21 +253,12 @@
             "description": "no response description was provided for this operation"
           }
         }
-      }
-    },
-    "/issues": {
+      },
       "get": {
         "summary": "List Issues",
         "description": "Lists the issues created by editor and given newsletter. \n\nNeeds to be logged in.\n",
         "operationId": "9486cc4d-7c60-41f8-a137-b93657b8c2ac",
         "parameters": [
-          {
-            "type": "string",
-            "default": "",
-            "name": "Cookie",
-            "required": false,
-            "in": "header"
-          },
           {
             "type": "string",
             "default": "3ee18ccf-7ccd-4a93-8095-3ccb23da97a5",
@@ -361,41 +279,25 @@
         "summary": "Get Issue",
         "description": "Returns Issue ID. \n\nNeeds to be logged in.\n",
         "operationId": "471d04c8-101e-4729-9361-1abf0425c98a",
-        "parameters": [
-          {
-            "type": "string",
-            "default": "",
-            "name": "Cookie",
-            "required": false,
-            "in": "header"
-          }
-        ],
         "responses": {
           "default": {
             "description": "no response description was provided for this operation"
           }
-        }
+        },
+        "parameters": []
       }
     },
     "/subscriptions": {
       "get": {
         "summary": "List Subscriptions",
-        "description": "Gets all subscriptions. You need to be logged in.",
+        "description": "Gets all subscriptions.\n\nYou need to be logged in.",
         "operationId": "499df924-cee7-43a6-abc1-62e49db90889",
-        "parameters": [
-          {
-            "type": "string",
-            "default": "",
-            "name": "Cookie",
-            "required": false,
-            "in": "header"
-          }
-        ],
         "responses": {
           "default": {
             "description": "no response description was provided for this operation"
           }
-        }
+        },
+        "parameters": []
       }
     },
     "/subscriptions/3ee18ccf-7ccd-4a93-8095-3ccb23da97a5/test@gmail.com": {
@@ -403,20 +305,12 @@
         "summary": "Get Subscription ID",
         "description": "Gets a subscription ID. \n\nThat can be used to generate a unsubscribe URL when user calls and complains. For cases where he has disability to click on unsubscribe link in delivered email.",
         "operationId": "3701ef24-8bb3-472b-b8a5-19bcd4d95279",
-        "parameters": [
-          {
-            "type": "string",
-            "default": "",
-            "name": "Cookie",
-            "required": false,
-            "in": "header"
-          }
-        ],
         "responses": {
           "default": {
             "description": "no response description was provided for this operation"
           }
-        }
+        },
+        "parameters": []
       }
     },
     "/subscriptions/subscribe/3ee18ccf-7ccd-4a93-8095-3ccb23da97a5": {
@@ -428,13 +322,6 @@
           "application/json"
         ],
         "parameters": [
-          {
-            "type": "string",
-            "default": "",
-            "name": "Cookie",
-            "required": false,
-            "in": "header"
-          },
           {
             "required": false,
             "schema": {
@@ -457,20 +344,12 @@
         "summary": "Unsubscribe",
         "description": "Get parameter is used so the user can easily subscribe from email. \n\nPath takes Subscription ID.",
         "operationId": "02c8ec8f-0272-498a-b0ee-c183d43a34bf",
-        "parameters": [
-          {
-            "type": "string",
-            "default": "",
-            "name": "Cookie",
-            "required": false,
-            "in": "header"
-          }
-        ],
         "responses": {
           "default": {
             "description": "no response description was provided for this operation"
           }
-        }
+        },
+        "parameters": []
       }
     }
   },
